@@ -39,12 +39,10 @@ namespace RenameFolders
             NewValue = newValu ?? string.Empty;
         }
 
-        public void Run()
+        protected void RenameDirsAndFiles(string[] dirs)
         {
-            string[] dirs = Directory.GetDirectories(Path);
-            
             string newPath = string.Empty;
-            
+
             foreach (string dir in dirs)
             {
                 foreach (var value in OldValue)
@@ -53,13 +51,25 @@ namespace RenameFolders
                     {
                         newPath = path + dir.Substring(path.Length).Trim().Replace(value, NewValue).Trim();
                         Console.WriteLine(newPath);
-                        Directory.Move(dir, newPath);
+
+                        if (Directory.Exists(newPath))
+                        {
+                            Directory.Move(dir, newPath);
+                        }
+                        else if (File.Exists(newPath))
+                        {
+                            File.Move(dir, newPath);
+                        }
                     }
                 }
-                
-                //newPath = path + dir.Replace(path, string.Empty).Replace("[SW.BAND]", "").Trim();
-                //Directory.Move(dir, newPath);
             }
+        }
+
+        public virtual void Run()
+        {
+            string[] dirs = Directory.GetDirectories(Path);
+            RenameDirsAndFiles(dirs);
+            
             Console.WriteLine();
         }
     }
